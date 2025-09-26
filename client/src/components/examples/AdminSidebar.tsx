@@ -1,0 +1,1 @@
+import { AdminSidebar } from "../AdminSidebar";\n\nexport default function AdminSidebarExample() {\n  return (\n    <div className="h-96 w-64">\n      <AdminSidebar \n        onLogout={() => console.log('Admin logout clicked')}\n      />\n    </div>\n  );\n}
