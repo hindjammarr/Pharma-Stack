@@ -108,11 +108,9 @@ const ManageUsers = () => {
         email: "",
         role: "user",
       });
-    }
-    // frontend/src/pages/ManageUsers.jsx (continued)
-      setFormLoading(false);
     } catch {
       setFormMessage("Erreur lors de la sauvegarde de l'utilisateur.");
+    } finally {
       setFormLoading(false);
     }
   };
@@ -290,7 +288,6 @@ const ManageUsers = () => {
       )}
     </div>
   );
-}
-
+};
 
 export default ManageUsers;
