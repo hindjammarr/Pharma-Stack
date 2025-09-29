@@ -17,7 +17,7 @@ const Orders = () => {
       setLoading(true);
       setError("");
       try {
-        const data = await orderService.getUser Orders(token);
+        const data = await orderService.getUserOrders(token);
         setOrders(data);
       } catch {
         setError("Erreur lors du chargement des commandes.");
