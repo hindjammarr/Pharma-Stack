@@ -5,9 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Star, ArrowRight, Shield, Truck, Clock, HeartHandshake } from "lucide-react";
 import { Link } from "wouter";
-import productsImage from "@assets/generated_images/Pharmacy_products_collection_8e9a162e.png";
-import pharmacistFemale from "@assets/generated_images/Female_pharmacist_portrait_d617a05c.png";
-import pharmacistMale from "@assets/generated_images/Male_pharmacist_portrait_eaf79249.png";
+// import productsImage from "../assets/generated_images/produits.png";
+// import pharmacistFemale from "../assets/women.png";
+// import pharmacistMale from "../assets/generated_images/pharportrait.png";
 
 export default function Accueil() {
   // Mock data

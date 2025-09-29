@@ -1,10 +1,38 @@
-import mongoose from "mongoose";
+// import mongoose from "mongoose";
+
+// const pharmacyInfoSchema = new mongoose.Schema({
+//   horaires: String,
+//   pharmacieDeGarde: String,
+//   adresse: String,
+//   telephone: String
+// });
+
+// export default mongoose.model("PharmacyInfo", pharmacyInfoSchema);
+
+
+const mongoose = require('mongoose');
 
 const pharmacyInfoSchema = new mongoose.Schema({
-  horaires: String,
-  pharmacieDeGarde: String,
-  adresse: String,
-  telephone: String
+  horaires: {
+    type: String,
+    default: 'Lundi - Vendredi: 8h00 - 19h00\nSamedi: 8h00 - 12h00'
+  },
+  pharmacieDeGarde: {
+    type: Boolean,
+    default: false
+  },
+  adresse: {
+    type: String,
+    default: '123 Rue de la Pharmacie, 75000 Paris'
+  },
+  telephone: {
+    type: String,
+    default: '+33 1 23 45 67 89'
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now
+  }
 });
 
-export default mongoose.model("PharmacyInfo", pharmacyInfoSchema);
+module.exports = mongoose.model('PharmacyInfo', pharmacyInfoSchema);

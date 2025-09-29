@@ -1,6 +1,13 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -8,16 +15,15 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Link } from "wouter";
 import { Eye, EyeOff, Mail, Lock, AlertCircle } from "lucide-react";
 
-export function LoginForm({ onLogin, isLoading, error }) {
+export function LoginForm({ onLogin, isLoading = false, error = "" }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [rememberMe, setRememberMe] = useState(false);
+  // const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [formErrors, setFormErrors] = useState({});
 
   const validateForm = () => {
     const errors = {};
-
     if (!email) {
       errors.email = "L'email est requis";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -27,7 +33,7 @@ export function LoginForm({ onLogin, isLoading, error }) {
     if (!password) {
       errors.password = "Le mot de passe est requis";
     } else if (password.length < 6) {
-      errors.password = "Le mot de passe doit contenir au moins 6 caractères";
+      errors.password = "Minimum 6 caractères";
     }
 
     setFormErrors(errors);
@@ -39,20 +45,17 @@ export function LoginForm({ onLogin, isLoading, error }) {
     if (!validateForm()) return;
 
     try {
-      console.log(`Attempting login for ${email}`);
-      await onLogin(email, password, rememberMe);
+      await onLogin(email, password);
     } catch (err) {
-      console.error("Login failed:", err);
+      console.error("Erreur de connexion :", err);
     }
   };
 
   return (
     <Card className="w-full max-w-md mx-auto">
-      <CardHeader className="space-y-1 text-center">
+      <CardHeader className="text-center space-y-1">
         <CardTitle className="text-2xl font-bold">Connexion</CardTitle>
-        <CardDescription>
-          Accédez à votre compte PharmaCare
-        </CardDescription>
+        <CardDescription>Accédez à votre compte PharmaCare</CardDescription>
       </CardHeader>
 
       <form onSubmit={handleSubmit}>
@@ -64,6 +67,7 @@ export function LoginForm({ onLogin, isLoading, error }) {
             </Alert>
           )}
 
+          {/* Email */}
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <div className="relative">
@@ -79,12 +83,12 @@ export function LoginForm({ onLogin, isLoading, error }) {
                 }}
                 className={`pl-10 ${formErrors.email ? "border-destructive" : ""}`}
                 disabled={isLoading}
-                data-testid="input-email"
               />
             </div>
             {formErrors.email && <p className="text-sm text-destructive">{formErrors.email}</p>}
           </div>
 
+          {/* Password */}
           <div className="space-y-2">
             <Label htmlFor="password">Mot de passe</Label>
             <div className="relative">
@@ -100,7 +104,6 @@ export function LoginForm({ onLogin, isLoading, error }) {
                 }}
                 className={`pl-10 pr-10 ${formErrors.password ? "border-destructive" : ""}`}
                 disabled={isLoading}
-                data-testid="input-password"
               />
               <Button
                 type="button"
@@ -109,7 +112,6 @@ export function LoginForm({ onLogin, isLoading, error }) {
                 className="absolute right-0 top-0 h-full px-3"
                 onClick={() => setShowPassword(!showPassword)}
                 disabled={isLoading}
-                data-testid="button-toggle-password"
               >
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </Button>
@@ -117,19 +119,19 @@ export function LoginForm({ onLogin, isLoading, error }) {
             {formErrors.password && <p className="text-sm text-destructive">{formErrors.password}</p>}
           </div>
 
+          {/* Remember + Forgot */}
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
+            {/* <div className="flex items-center space-x-2">
               <Checkbox
                 id="remember"
                 checked={rememberMe}
                 onCheckedChange={(checked) => setRememberMe(checked)}
                 disabled={isLoading}
-                data-testid="checkbox-remember"
               />
               <Label htmlFor="remember" className="text-sm">
                 Se souvenir de moi
               </Label>
-            </div>
+            </div> */}
 
             <Link href="/mot-de-passe-oublie">
               <Button variant="link" className="p-0 h-auto text-sm">
@@ -139,13 +141,9 @@ export function LoginForm({ onLogin, isLoading, error }) {
           </div>
         </CardContent>
 
+        {/* Submit + Register */}
         <CardFooter className="flex flex-col space-y-4">
-          <Button
-            type="submit"
-            className="w-full"
-            disabled={isLoading}
-            data-testid="button-login"
-          >
+          <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading ? "Connexion..." : "Se connecter"}
           </Button>
 

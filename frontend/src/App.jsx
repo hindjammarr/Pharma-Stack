@@ -58,19 +58,20 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/lib/theme";
 import { Header } from "@/components/Header";
+import InscriptionPage from "./pages/InscriptionPage";
 
 // Pages publiques
 import Accueil from "@/pages/Accueil";
 import Produits from "@/pages/Produits";
 import Contact from "@/pages/Contact";
 import Services from "@/pages/Services";
-import Login from "@/pages/Login";
-import Signup from "@/pages/Signup";
+// import Login from "@/pages/Login";
+// import Signup from "@/pages/Signup";
 import NotFound from "@/pages/not-found";
 
 // Pages client
-import Account from "@/pages/Account";
-import Orders from "@/pages/Orders";
+// import Account from "@/pages/Account";
+ import Orders from "@/pages/Orders";
 import Cart from "@/pages/Cart";
 
 // Pages admin
@@ -80,6 +81,7 @@ import ManageCategories from "@/pages/admin/ManageCategories";
 import ManageUsers from "@/pages/admin/ManageUsers";
 import ManageOrders from "@/pages/admin/ManageOrders";
 import Settings from "@/pages/admin/Settings";
+import LoginPage from "./pages/LoginPage";
 
 function Router() {
   return (
@@ -89,11 +91,11 @@ function Router() {
       <Route path="/produits" component={Produits} />
       <Route path="/services" component={Services} />
       <Route path="/contact" component={Contact} />
-      <Route path="/connexion" component={Login} />
-      <Route path="/inscription" component={Signup} />
-
+       <Route path="/login" component={LoginPage} />
+      
+        <Route path="/inscription" component={InscriptionPage} />
       {/* Pages client */}
-      <Route path="/compte" component={Account} />
+      {/* <Route path="/compte" component={Account} /> */}
       <Route path="/commandes" component={Orders} />
       <Route path="/panier" component={Cart} />
 
