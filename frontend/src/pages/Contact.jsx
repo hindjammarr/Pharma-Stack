@@ -7,7 +7,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Phone, Mail, Clock, MessageSquare, Send, CheckCircle } from "lucide-react";
-import pharmacyImage from "@assets/generated_images/Pharmacy_storefront_exterior_131b0121.png";
+// import pharmacyImage from "@assets/generated_images/pharma.png";
+import pharmacyImage from "../assets/generated_images/pharma.png";
+
 
 export default function Contact() {
   const [formData, setFormData] = useState({

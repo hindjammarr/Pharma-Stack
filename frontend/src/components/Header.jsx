@@ -20,7 +20,11 @@ export function Header() {
     { path: "/", label: "Accueil" },
     { path: "/produits", label: "Produits" },
     { path: "/services", label: "Services" },
-    { path: "/contact", label: "Contact" }
+    { path: "/contact", label: "Contact" },
+    { path: "/login", label:"Login"},
+    { path: "/inscription", label:"Inscription"}
+
+
   ];
 
   return (

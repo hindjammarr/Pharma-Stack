@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ArrowRight, Shield, Clock, Truck, Phone } from "lucide-react";
 import { Link } from "wouter";
-import heroImage from "@assets/generated_images/Pharmacy_interior_hero_2e40cd21.png";
+import heroImage from "../assets/generated_images/pharma.png";
 
 export function HeroSection() {
   const features = [

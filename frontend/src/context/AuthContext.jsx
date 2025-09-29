@@ -37,7 +37,7 @@ export function AuthProvider({ children }) {
       }
       try {
         // Option A: if backend provides /auth/me to get current user
-        const { data } = await api.get("/auth/me"); // optional: implement on backend
+        const { data } = await api.get("/me"); // optional: implement on backend
         setUser(data.user);
       } catch (err) {
         // if /auth/me isn't available or token invalid, we'll just clear token
@@ -52,7 +52,7 @@ export function AuthProvider({ children }) {
   }, []); // run once on mount
 
   const login = async (email, password, remember = false) => {
-    const { data } = await api.post("/auth/login", { email, password });
+    const { data } = await api.post("/login", { email, password });
     if (data?.token) {
       setToken(data.token);
       setUser(data.user || null);
@@ -66,7 +66,7 @@ export function AuthProvider({ children }) {
   };
 
   const signup = async (name, email, password) => {
-    const { data } = await api.post("/auth/register", { name, email, password });
+    const { data } = await api.post("/register", { name, email, password });
     if (data?.token) {
       setToken(data.token);
       setUser(data.user || null);
