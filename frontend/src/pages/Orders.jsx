@@ -1,57 +1,97 @@
-import React, { useEffect, useState } from "react";
-import api from "@/services/api";
+import React, { useContext, useEffect, useState } from "react";
+import { AuthContext } from "../context/AuthContext";
+import orderService from "../services/orderService";
 
-export default function Orders() {
+const Orders = () => {
+  const { user, token } = useContext(AuthContext);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  // Charger toutes les commandes depuis l'API
-  const fetchOrders = async () => {
-    try {
-      const { data } = await api.get("/orders");
-      setOrders(data);
-    } catch (err) {
-      console.error("Erreur lors du chargement des commandes :", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [error, setError] = useState("");
 
   useEffect(() => {
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+    const fetchOrders = async () => {
+      setLoading(true);
+      setError("");
+      try {
+        const data = await orderService.getUser Orders(token);
+        setOrders(data);
+      } catch {
+        setError("Erreur lors du chargement des commandes.");
+      } finally {
+        setLoading(false);
+      }
+    };
     fetchOrders();
-  }, []);
+  }, [user, token]);
 
-  if (loading) {
-    return <div className="p-4">Chargement des commandes...</div>;
-  }
-
-  if (!orders.length) {
-    return <div className="p-4">Aucune commande trouvée.</div>;
+  if (!user) {
+    return (
+      <div className="max-w-md mx-auto mt-12 p-6 bg-white rounded shadow-md text-center">
+        <p>Vous devez être connecté pour voir vos commandes.</p>
+      </div>
+    );
   }
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-4">Mes commandes</h1>
-      <table className="w-full border-collapse border border-gray-300">
-        <thead>
-          <tr className="bg-gray-100">
-            <th className="border p-2">ID</th>
-            <th className="border p-2">Client</th>
-            <th className="border p-2">Total (€)</th>
-            <th className="border p-2">Statut</th>
-          </tr>
-        </thead>
-        <tbody>
+    <div className="max-w-5xl mx-auto px-4 py-8">
+      <h1 className="text-3xl font-semibold mb-6">Mes Commandes</h1>
+      {loading ? (
+        <p>Chargement des commandes...</p>
+      ) : error ? (
+        <p className="text-red-600">{error}</p>
+      ) : orders.length === 0 ? (
+        <p>Vous n'avez aucune commande.</p>
+      ) : (
+        <div className="space-y-6">
           {orders.map((order) => (
-            <tr key={order._id} className="border-b">
-              <td className="border p-2">{order._id}</td>
-              <td className="border p-2">{order.user?.name || "N/A"}</td>
-              <td className="border p-2">{order.total.toFixed(2)}</td>
-              <td className="border p-2">{order.status}</td>
-            </tr>
+            <div
+              key={order._id}
+              className="border rounded p-4 shadow-sm bg-white"
+            >
+              <div className="flex justify-between mb-2">
+                <div>
+                  <p className="font-semibold">Commande #{order._id}</p>
+                  <p className="text-sm text-gray-600">
+                    Date: {new Date(order.createdAt).toLocaleDateString()}
+                  </p>
+                </div>
+                <div>
+                  <p
+                    className={`font-semibold ${
+                      order.status === "Livrée"
+                        ? "text-green-600"
+                        : order.status === "En cours"
+                        ? "text-yellow-600"
+                        : "text-red-600"
+                    }`}
+                  >
+                    {order.status}
+                  </p>
+                </div>
+              </div>
+              <div>
+                <ul className="list-disc list-inside text-gray-700">
+                  {order.items.map((item) => (
+                    <li key={item.product._id}>
+                      {item.product.name} x {item.quantity} -{" "}
+                      {(item.product.price * item.quantity).toFixed(2)} €
+                    </li>
+                  ))}
+                </ul>
+                <p className="mt-2 font-semibold">
+                  Total: {order.total.toFixed(2)} €
+                </p>
+              </div>
+            </div>
           ))}
-        </tbody>
-      </table>
+        </div>
+      )}
     </div>
   );
-}
+};
+
+export default Orders;
