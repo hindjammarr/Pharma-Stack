@@ -1,1 +1,0 @@
-import { HeroSection } from "../HeroSection";\n\nexport default function HeroSectionExample() {\n  return <HeroSection />;\n}

@@ -1,1 +1,0 @@
-import { Header } from "../Header";\nimport { ThemeProvider } from "@/lib/theme";\n\nexport default function HeaderExample() {\n  return (\n    <ThemeProvider>\n      <Header />\n    </ThemeProvider>\n  );\n}

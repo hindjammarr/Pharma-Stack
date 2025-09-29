@@ -1,83 +1,56 @@
-// import React, { useState, useEffect } from "react";
-// import api from "@/services/api";
+// frontend/src/pages/Cart.jsx
+import React, { useContext } from "react";
+import { CartContext } from "../context/CartContext";
+import CartItem from "../components/CartItem";
+import { useNavigate } from "react-router-dom";
 
-// export default function Cart() {
-//   const [cartItems, setCartItems] = useState([]);
-//   const [loading, setLoading] = useState(true);
+const Cart = () => {
+  const { cartItems, removeFromCart, clearCart, totalPrice } = useContext(CartContext);
+  const navigate = useNavigate();
 
-//   // Ici tu peux adapter selon ton backend (route /cart ou panier lié à l'utilisateur)
-//   const fetchCart = async () => {
-//     try {
-//       const { data } = await api.get("/cart");
-//       setCartItems(data);
-//     } catch (err) {
-//       console.error("Erreur lors du chargement du panier :", err);
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   useEffect(() => {
-//     fetchCart();
-//   }, []);
-
-//   if (loading) return <div className="p-4">Chargement du panier...</div>;
-//   if (!cartItems.length) return <div className="p-4">Votre panier est vide.</div>;
-
-//   return (
-//     <div className="container mx-auto p-4">
-//       <h1 className="text-3xl font-bold mb-4">Mon panier</h1>
-//       <ul>
-//         {cartItems.map(item => (
-//           <li key={item._id} className="border p-2 mb-2 rounded">
-//             {item.productName} - Quantité : {item.quantity} - Prix : {item.price} €
-//           </li>
-//         ))}
-//       </ul>
-//     </div>
-//   );
-// }
-
-
-import React, { useState, useEffect } from "react";
-import api from "@/services/api";
-
-export default function Cart() {
-  const [cartItems, setCartItems] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  const fetchCart = async () => {
-    try {
-      const { data } = await api.get("/cart"); // adapte selon ton backend
-      // Assure-toi que data est un tableau
-      setCartItems(Array.isArray(data) ? data : []);
-    } catch (err) {
-      console.error("Erreur lors du chargement du panier :", err);
-      setCartItems([]);
-    } finally {
-      setLoading(false);
-    }
+  const handleCheckout = () => {
+    navigate("/orders/checkout");
   };
 
-  useEffect(() => {
-    fetchCart();
-  }, []);
-
-  if (loading) return <div className="p-4">Chargement du panier...</div>;
-  if (!cartItems.length) return <div className="p-4">Votre panier est vide.</div>;
+  if (cartItems.length === 0) {
+    return (
+      <div className="max-w-md mx-auto mt-12 p-6 bg-white rounded shadow-md text-center">
+        <p>Votre panier est vide.</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-4">Mon panier</h1>
-      <ul>
-        {cartItems.map((item, index) => (
-          <li key={item._id || index} className="border p-2 mb-2 rounded">
-            Produit: {item.product?.name || item.productName} <br />
-            Quantité: {item.quantity} <br />
-            Prix: {item.price} €
-          </li>
+    <div className="max-w-4xl mx-auto px-4 py-8">
+      <h1 className="text-3xl font-semibold mb-6">Mon Panier</h1>
+      <div className="space-y-4">
+        {cartItems.map((item) => (
+          <CartItem
+            key={item.product._id}
+            item={item}
+            onRemove={() => removeFromCart(item.product._id)}
+          />
         ))}
-      </ul>
+      </div>
+      <div className="mt-6 flex justify-between items-center">
+        <button
+          onClick={clearCart}
+          className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded"
+        >
+          Vider le panier
+        </button>
+        <div className="text-xl font-semibold">
+          Total: {totalPrice.toFixed(2)} €
+        </div>
+        <button
+          onClick={handleCheckout}
+          className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded"
+        >
+          Passer la commande
+        </button>
+      </div>
     </div>
   );
-}
+};
+
+export default Cart;

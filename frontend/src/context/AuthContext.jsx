@@ -1,93 +1,97 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
-import api, { setAuthToken } from "@/services/api";
-import { useNavigate } from "react-router-dom";
 
-/**
- * AuthContext responsibilities:
- * - store current user and token
- * - provide login, signup, logout helpers
- * - persist token in localStorage
- */
+import React, { createContext, useState, useContext, useEffect } from 'react'
+import axios from 'axios'
 
-const AuthContext = createContext();
+const AuthContext = createContext()
 
-export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null); // { _id, name, email, role }
-  const [token, setToken] = useState(() => localStorage.getItem("pharmacy_token"));
-  const [loading, setLoading] = useState(Boolean(token)); // if token present, try restore
-  const navigate = useNavigate();
-
-  // Set axios header whenever token changes
-  useEffect(() => {
-    if (token) {
-      setAuthToken(token);
-      localStorage.setItem("pharmacy_token", token);
-    } else {
-      setAuthToken(null);
-      localStorage.removeItem("pharmacy_token");
-    }
-  }, [token]);
-
-  // Try to restore user from token (if backend has me endpoint). If not, backend login returns user.
-  useEffect(() => {
-    const restore = async () => {
-      if (!token) {
-        setLoading(false);
-        return;
-      }
-      try {
-        // Option A: if backend provides /auth/me to get current user
-        const { data } = await api.get("/me"); // optional: implement on backend
-        setUser(data.user);
-      } catch (err) {
-        // if /auth/me isn't available or token invalid, we'll just clear token
-        console.warn("Could not restore session:", err?.response?.data || err.message);
-        setToken(null);
-        setUser(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-    restore();
-  }, []); // run once on mount
-
-  const login = async (email, password, remember = false) => {
-    const { data } = await api.post("/login", { email, password });
-    if (data?.token) {
-      setToken(data.token);
-      setUser(data.user || null);
-      if (!remember) {
-        // if not remember, keep in memory but we already store in localStorage by default.
-        // For HttpOnly cookie approach, adjust backend to set cookie and don't store token.
-      }
-      return data;
-    }
-    throw new Error("Login failed");
-  };
-
-  const signup = async (name, email, password) => {
-    const { data } = await api.post("/register", { name, email, password });
-    if (data?.token) {
-      setToken(data.token);
-      setUser(data.user || null);
-      return data;
-    }
-    throw new Error("Signup failed");
-  };
-
-  const logout = () => {
-    setToken(null);
-    setUser(null);
-    navigate("/", { replace: true });
-  };
-
-  return (
-    <AuthContext.Provider value={{ user, token, loading, login, signup, logout, setUser }}>
-      {children}
-    </AuthContext.Provider>
-  );
+export const useAuth = () => {
+  const context = useContext(AuthContext)
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider')
+  }
+  return context
 }
 
-export function useAuth() {
-  return useContext(AuthContext);
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const token = localStorage.getItem('token')
+    if (token) {
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+      checkAuth()
+    } else {
+      setLoading(false)
+    }
+  }, [])
+
+  const checkAuth = async () => {
+    try {
+      const response = await axios.get('/api/auth/me')
+      setUser(response.data.user)
+    } catch (error) {
+      localStorage.removeItem('token')
+      delete axios.defaults.headers.common['Authorization']
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const login = async (email, password) => {
+    try {
+      const response = await axios.post('/api/auth/login', { email, password })
+      const { token, user } = response.data
+      
+      localStorage.setItem('token', token)
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+      setUser(user)
+      
+      return { success: true }
+    } catch (error) {
+      return { 
+        success: false, 
+        message: error.response?.data?.message || 'Login failed' 
+      }
+    }
+  }
+
+  const signup = async (userData) => {
+    try {
+      const response = await axios.post('/api/auth/signup', userData)
+      const { token, user } = response.data
+      
+      localStorage.setItem('token', token)
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+      setUser(user)
+      
+      return { success: true }
+    } catch (error) {
+      return { 
+        success: false, 
+        message: error.response?.data?.message || 'Signup failed' 
+      }
+    }
+  }
+
+  const logout = () => {
+    localStorage.removeItem('token')
+    delete axios.defaults.headers.common['Authorization']
+    setUser(null)
+  }
+
+  const value = {
+    user,
+    loading,
+    login,
+    signup,
+    logout,
+    checkAuth
+  }
+
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  )
 }
