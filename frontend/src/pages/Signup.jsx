@@ -249,7 +249,7 @@ const Signup = () => {
       setUser(data.user);
       setToken(data.token);
       localStorage.setItem("token", data.token);
-      navigate("/");
+      navigate("/login");
     } catch (error) {
       setApiError(
         error.response?.data?.message || "Erreur lors de l'inscription."
