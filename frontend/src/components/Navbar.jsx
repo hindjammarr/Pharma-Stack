@@ -1,17 +1,20 @@
-import React, { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext'
-import { Menu, X, ShoppingCart, User } from 'lucide-react'
+import React, { useState, useContext } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { Menu, X, ShoppingCart, User } from "lucide-react";
+import { CartContext } from "../context/CartContext";
 
 const Navbar = () => {
-  const [isOpen, setIsOpen] = useState(false)
-  const { user, logout } = useAuth()
-  const navigate = useNavigate()
+  const [isOpen, setIsOpen] = useState(false);
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const { cartItems } = useContext(CartContext);
+  const totalQuantity = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   const handleLogout = () => {
-    logout()
-    navigate('/')
-  }
+    logout();
+    navigate("/");
+  };
 
   return (
     <nav className="bg-primary text-primary-foreground shadow-lg">
@@ -19,42 +22,75 @@ const Navbar = () => {
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <Link to="/" className="flex-shrink-0 text-xl font-bold">
-              PharmaPlus
+              PharmaCare
             </Link>
           </div>
 
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center space-x-4">
-            <Link to="/" className="hover:bg-primary-foreground hover:text-primary px-3 py-2 rounded-md">
+            <Link
+              to="/"
+              className="hover:bg-primary-foreground hover:text-primary px-3 py-2 rounded-md"
+            >
               Accueil
             </Link>
-            <Link to="/produits" className="hover:bg-primary-foreground hover:text-primary px-3 py-2 rounded-md">
+            <Link
+              to="/produits"
+              className="hover:bg-primary-foreground hover:text-primary px-3 py-2 rounded-md"
+            >
               Produits
             </Link>
-            <Link to="/services" className="hover:bg-primary-foreground hover:text-primary px-3 py-2 rounded-md">
+            <Link
+              to="/services"
+              className="hover:bg-primary-foreground hover:text-primary px-3 py-2 rounded-md"
+            >
               Services
             </Link>
-            <Link to="/contact" className="hover:bg-primary-foreground hover:text-primary px-3 py-2 rounded-md">
+            <Link
+              to="/contact"
+              className="hover:bg-primary-foreground hover:text-primary px-3 py-2 rounded-md"
+            >
               Contact
             </Link>
 
             {user ? (
               <div className="flex items-center space-x-4">
-                <Link to="/cart" className="hover:bg-primary-foreground hover:text-primary p-2 rounded-md">
+                {/* <Link to="/cart" className="hover:bg-primary-foreground hover:text-primary p-2 rounded-md">
                   <ShoppingCart size={20} />
+                </Link> */}
+                <Link
+                  to="/cart"
+                  className="relative hover:bg-primary-foreground hover:text-primary p-2 rounded-md"
+                >
+                  <ShoppingCart size={20} />
+                  {totalQuantity > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs font-bold rounded-full px-1.5 py-0.5">
+                      {totalQuantity}
+                    </span>
+                  )}
                 </Link>
-                {user.role === 'admin' ? (
+
+                {user.role === "admin" ? (
                   <>
-                    <Link to="/dashboard" className="hover:bg-primary-foreground hover:text-primary px-3 py-2 rounded-md">
+                    <Link
+                      to="/dashboard"
+                      className="hover:bg-primary-foreground hover:text-primary px-3 py-2 rounded-md"
+                    >
                       Dashboard
                     </Link>
                   </>
                 ) : (
                   <>
-                    <Link to="/orders" className="hover:bg-primary-foreground hover:text-primary px-3 py-2 rounded-md">
+                    <Link
+                      to="/orders"
+                      className="hover:bg-primary-foreground hover:text-primary px-3 py-2 rounded-md"
+                    >
                       Mes Commandes
                     </Link>
-                    <Link to="/account" className="hover:bg-primary-foreground hover:text-primary px-3 py-2 rounded-md">
+                    <Link
+                      to="/account"
+                      className="hover:bg-primary-foreground hover:text-primary px-3 py-2 rounded-md"
+                    >
                       <User size={20} />
                     </Link>
                   </>
@@ -68,10 +104,16 @@ const Navbar = () => {
               </div>
             ) : (
               <div className="flex items-center space-x-4">
-                <Link to="/login" className="hover:bg-primary-foreground hover:text-primary px-3 py-2 rounded-md">
+                <Link
+                  to="/login"
+                  className="hover:bg-primary-foreground hover:text-primary px-3 py-2 rounded-md"
+                >
                   Connexion
                 </Link>
-                <Link to="/signup" className="bg-secondary text-secondary-foreground px-4 py-2 rounded-md hover:bg-secondary/90">
+                <Link
+                  to="/signup"
+                  className="bg-secondary text-secondary-foreground px-4 py-2 rounded-md hover:bg-secondary/90"
+                >
                   Inscription
                 </Link>
               </div>
@@ -93,34 +135,58 @@ const Navbar = () => {
         {isOpen && (
           <div className="md:hidden">
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-              <Link to="/" className="block px-3 py-2 rounded-md hover:bg-primary-foreground hover:text-primary">
+              <Link
+                to="/"
+                className="block px-3 py-2 rounded-md hover:bg-primary-foreground hover:text-primary"
+              >
                 Accueil
               </Link>
-              <Link to="/produits" className="block px-3 py-2 rounded-md hover:bg-primary-foreground hover:text-primary">
+              <Link
+                to="/produits"
+                className="block px-3 py-2 rounded-md hover:bg-primary-foreground hover:text-primary"
+              >
                 Produits
               </Link>
-              <Link to="/services" className="block px-3 py-2 rounded-md hover:bg-primary-foreground hover:text-primary">
+              <Link
+                to="/services"
+                className="block px-3 py-2 rounded-md hover:bg-primary-foreground hover:text-primary"
+              >
                 Services
               </Link>
-              <Link to="/contact" className="block px-3 py-2 rounded-md hover:bg-primary-foreground hover:text-primary">
+              <Link
+                to="/contact"
+                className="block px-3 py-2 rounded-md hover:bg-primary-foreground hover:text-primary"
+              >
                 Contact
               </Link>
 
               {user ? (
                 <>
-                  <Link to="/cart" className="block px-3 py-2 rounded-md hover:bg-primary-foreground hover:text-primary">
+                  <Link
+                    to="/cart"
+                    className="block px-3 py-2 rounded-md hover:bg-primary-foreground hover:text-primary"
+                  >
                     Panier
                   </Link>
-                  {user.role === 'admin' ? (
-                    <Link to="/dashboard" className="block px-3 py-2 rounded-md hover:bg-primary-foreground hover:text-primary">
+                  {user.role === "admin" ? (
+                    <Link
+                      to="/dashboard"
+                      className="block px-3 py-2 rounded-md hover:bg-primary-foreground hover:text-primary"
+                    >
                       Dashboard
                     </Link>
                   ) : (
                     <>
-                      <Link to="/orders" className="block px-3 py-2 rounded-md hover:bg-primary-foreground hover:text-primary">
+                      <Link
+                        to="/orders"
+                        className="block px-3 py-2 rounded-md hover:bg-primary-foreground hover:text-primary"
+                      >
                         Mes Commandes
                       </Link>
-                      <Link to="/account" className="block px-3 py-2 rounded-md hover:bg-primary-foreground hover:text-primary">
+                      <Link
+                        to="/account"
+                        className="block px-3 py-2 rounded-md hover:bg-primary-foreground hover:text-primary"
+                      >
                         Mon Compte
                       </Link>
                     </>
@@ -134,10 +200,16 @@ const Navbar = () => {
                 </>
               ) : (
                 <>
-                  <Link to="/login" className="block px-3 py-2 rounded-md hover:bg-primary-foreground hover:text-primary">
+                  <Link
+                    to="/login"
+                    className="block px-3 py-2 rounded-md hover:bg-primary-foreground hover:text-primary"
+                  >
                     Connexion
                   </Link>
-                  <Link to="/signup" className="block px-3 py-2 rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/90">
+                  <Link
+                    to="/signup"
+                    className="block px-3 py-2 rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/90"
+                  >
                     Inscription
                   </Link>
                 </>
@@ -147,7 +219,7 @@ const Navbar = () => {
         )}
       </div>
     </nav>
-  )
-}
+  );
+};
 
-export default Navbar
+export default Navbar;

@@ -1,11 +1,15 @@
-// nv
 
-import  HeroSection  from "../components/HeroSection";
-import  ProductCard  from "../components/ProductCard";
-import { ArrowRight } from "lucide-react";
-import { Link } from "wouter";
+import React, { useEffect, useState } from "react";
+import HeroSection from "../components/HeroSection";
+import ProductCard from "../components/ProductCard";
+import { ArrowRight, ShieldCheck, ShieldX } from "lucide-react";
+import { Link } from "react-router-dom";
+import pharmacyService from "../services/pharmacyService";
 
 export default function Accueil() {
+  const [pharmacyInfo, setPharmacyInfo] = useState(null);
+  const [loading, setLoading] = useState(true);
+
   const featuredProducts = [
     {
       id: "1",
@@ -41,10 +45,56 @@ export default function Accueil() {
     }
   ];
 
+  useEffect(() => {
+    const fetchPharmacyInfo = async () => {
+      try {
+        const data = await pharmacyService.getInfo();
+        setPharmacyInfo(data);
+      } catch (error) {
+        console.error("Erreur chargement pharmacie :", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPharmacyInfo();
+  }, []);
+
   return (
     <div className="min-h-screen">
       <HeroSection />
 
+      {/* ✅ Bloc pharmacie de garde */}
+      <section className="bg-white py-6 border-b">
+  <div className="container mx-auto px-4">   
+     <div className="flex flex-col items-center justify-center text-center">            <h2 className="text-xl font-semibold text-gray-800">
+              État de la pharmacie
+            </h2>
+            {loading ? (
+              <p className="text-gray-500">Chargement...</p>
+            ) : pharmacyInfo ? (
+              <p className="text-lg mt-2">
+                Pharmacie de garde :{" "}
+                {pharmacyInfo.pharmacieDeGarde ? (
+                  <span className="inline-flex items-center text-green-600 font-bold">
+                    <ShieldCheck className="w-5 h-5 mr-1" />
+                    Oui
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center text-red-600 font-bold">
+                    <ShieldX className="w-5 h-5 mr-1" />
+                    Non
+                  </span>
+                )}
+              </p>
+            ) : (
+              <p className="text-red-500">Information indisponible</p>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* ✅ Section produits */}
       <section className="py-16 bg-gray-100">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
@@ -61,30 +111,18 @@ export default function Accueil() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             {featuredProducts.map((product) => (
-              // <ProductCard
-              //   key={product.id}
-              //   id={product.id}
-              //   name={product.name}
-              //   description={product.description}
-              //   price={product.price}
-              //   stock={product.stock}
-              //   category={product.category}
-              //   onAddToCart={(id) => console.log(`Added product ${id} to cart`)}
-              //   onViewDetails={(id) => console.log(`Viewing product ${id}`)}
-              // />
               <ProductCard
-  key={product.id}
-  product={product}
-  onAddToCart={(id) => console.log(`Added product ${id} to cart`)}
-  onViewDetails={(id) => console.log(`Viewing product ${id}`)}
-/>
-
+                key={product.id}
+                product={product}
+                onAddToCart={(id) => console.log(`Added product ${id} to cart`)}
+                onViewDetails={(id) => console.log(`Viewing product ${id}`)}
+              />
             ))}
           </div>
 
           <div className="text-center">
             <Link
-              href="/produits"
+              to="/produits"
               className="inline-flex items-center justify-center bg-teal-600 hover:bg-teal-700 text-white text-lg font-medium px-8 py-3 rounded transition"
             >
               Voir tous nos produits
@@ -96,5 +134,3 @@ export default function Accueil() {
     </div>
   );
 }
-
-

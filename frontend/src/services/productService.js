@@ -13,15 +13,26 @@ const getByCategory = async (categoryId) => {
   return response.data;
 };
 
-const createProduct = async (productData) => {
-  const response = await axios.post(API_URL, productData);
-  return response.data;
+const createProduct = async (formData) => {
+  const res = await axios.post("/api/products", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return res.data;
 };
 
-const updateProduct = async (id, productData) => {
-  const response = await axios.put(`${API_URL}/${id}`, productData);
-  return response.data;
+
+// const updateProduct = async (id, productData) => {
+//   const response = await axios.put(`${API_URL}/${id}`, productData);
+//   return response.data;
+// };
+
+const updateProduct = async (id, formData) => {
+  const res = await axios.put(`/api/products/${id}`, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return res.data;
 };
+
 
 const deleteProduct = async (id) => {
   const response = await axios.delete(`${API_URL}/${id}`);

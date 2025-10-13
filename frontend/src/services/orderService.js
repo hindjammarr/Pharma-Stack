@@ -4,25 +4,46 @@ import axios from "axios";
 const API_URL = "/api/orders";
 
 const getUserOrders = async (token) => {
-  const response = await axios.get(`${API_URL}/my`, {
+  const response = await axios.get(`${API_URL}/my-orders`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   return response.data;
 };
 
+
 const getAllOrders = async () => {
-  const response = await axios.get(API_URL);
+  const token = localStorage.getItem("token");
+  const response = await axios.get("/api/orders", {
+    headers: { Authorization: `Bearer ${token}` },
+  });
   return response.data;
 };
 
-const updateOrderStatus = async (orderId, status) => {
-  const response = await axios.put(`${API_URL}/${orderId}/status`, { status });
+const createOrder = async (orderData, token) => {
+  const response = await axios.post("/api/orders", orderData, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
   return response.data;
 };
+
+
+const updateOrderStatus = async (orderId, status, token) => {
+  const response = await axios.put(
+    `${API_URL}/${orderId}/status`,
+    { status },
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  return response.data;
+};
+
 
 const orderService = {
   getUserOrders,
   getAllOrders,
+  createOrder,
   updateOrderStatus,
 };
 

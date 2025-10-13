@@ -15,6 +15,7 @@ const ManageProducts = () => {
     price: "",
     category: "",
     stock: "",
+    imageFile: null,
   });
   const [formErrors, setFormErrors] = useState({});
   const [formLoading, setFormLoading] = useState(false);
@@ -87,58 +88,113 @@ const ManageProducts = () => {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const errs = validateForm();
-    if (Object.keys(errs).length > 0) {
-      setFormErrors(errs);
-      return;
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   const errs = validateForm();
+  //   if (Object.keys(errs).length > 0) {
+  //     setFormErrors(errs);
+  //     return;
+  //   }
+  //   setFormLoading(true);
+  //   setFormMessage("");
+  //   try {
+  //     if (form._id) {
+  //       // update
+  //       const updated = await productService.updateProduct(form._id, {
+  //         name: form.name.trim(),
+  //         description: form.description.trim(),
+  //         price: Number(form.price),
+  //         category: form.category,
+  //         stock: Number(form.stock),
+  //       });
+  //       setProducts((prev) =>
+  //         prev.map((p) => (p._id === updated._id ? updated : p))
+  //       );
+  //       setFormMessage("Produit mis à jour avec succès.");
+  //     } else {
+  //       const formData = new FormData();
+  //       formData.append("name", form.name.trim());
+  //       formData.append("description", form.description.trim());
+  //       formData.append("price", Number(form.price));
+  //       formData.append("category", form.category);
+  //       formData.append("stock", Number(form.stock));
+  //       if (form.imageFile) {
+  //         formData.append("image", form.imageFile); // ✅ fichier image
+  //       }
+         
+  //       const created = await productService.createProduct(formData);
+
+  //       setProducts((prev) => [created, ...prev]);
+  //       setFormMessage("Produit créé avec succès.");
+  //     }
+  //     setForm({
+  //       _id: null,
+  //       name: "",
+  //       description: "",
+  //       price: "",
+  //       category: "",
+  //       stock: "",
+  //       imageFile: null,
+  //     });
+  //     setFormErrors({});
+  //   } catch {
+  //     setFormMessage("Erreur lors de la sauvegarde du produit.");
+  //   } finally {
+  //     setFormLoading(false);
+  //     // frontend/src/pages/ManageProducts.jsx (continued)
+  //     setFormLoading(false);
+  //   }
+  // };
+   const handleSubmit = async (e) => {
+  e.preventDefault();
+  const errs = validateForm();
+  if (Object.keys(errs).length > 0) {
+    setFormErrors(errs);
+    return;
+  }
+
+  setFormLoading(true);
+  setFormMessage("");
+
+  try {
+    const formData = new FormData();
+    formData.append("name", form.name.trim());
+    formData.append("description", form.description.trim());
+    formData.append("price", Number(form.price));
+    formData.append("category", form.category);
+    formData.append("stock", Number(form.stock));
+    if (form.imageFile) {
+      formData.append("image", form.imageFile); // ✅ nouvelle image
     }
-    setFormLoading(true);
-    setFormMessage("");
-    try {
-      if (form._id) {
-        // update
-        const updated = await productService.updateProduct(form._id, {
-          name: form.name.trim(),
-          description: form.description.trim(),
-          price: Number(form.price),
-          category: form.category,
-          stock: Number(form.stock),
-        });
-        setProducts((prev) =>
-          prev.map((p) => (p._id === updated._id ? updated : p))
-        );
-        setFormMessage("Produit mis à jour avec succès.");
-      } else {
-        // create
-        const created = await productService.createProduct({
-          name: form.name.trim(),
-          description: form.description.trim(),
-          price: Number(form.price),
-          category: form.category,
-          stock: Number(form.stock),
-        });
-        setProducts((prev) => [created, ...prev]);
-        setFormMessage("Produit créé avec succès.");
-      }
-      setForm({
-        _id: null,
-        name: "",
-        description: "",
-        price: "",
-        category: "",
-        stock: "",
-      });
-      setFormErrors({});
-    } catch {
-      setFormMessage("Erreur lors de la sauvegarde du produit.");
-    } finally {
-      setFormLoading(false);
-      // frontend/src/pages/ManageProducts.jsx (continued)
-      setFormLoading(false);
+
+    if (form._id) {
+      const updated = await productService.updateProduct(form._id, formData);
+      setProducts((prev) =>
+        prev.map((p) => (p._id === updated._id ? updated : p))
+      );
+      setFormMessage("Produit mis à jour avec succès.");
+    } else {
+      const created = await productService.createProduct(formData);
+      setProducts((prev) => [created, ...prev]);
+      setFormMessage("Produit créé avec succès.");
     }
-  };
+
+    setForm({
+      _id: null,
+      name: "",
+      description: "",
+      price: "",
+      category: "",
+      stock: "",
+      imageFile: null,
+    });
+    setFormErrors({});
+  } catch {
+    setFormMessage("Erreur lors de la sauvegarde du produit.");
+  } finally {
+    setFormLoading(false);
+  }
+};
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
@@ -269,6 +325,21 @@ const ManageProducts = () => {
           </div>
         </div>
 
+        <div className="mb-4">
+          <label htmlFor="image" className="block mb-1 font-medium">
+            Image
+          </label>
+          <input
+            type="file"
+            id="image"
+            name="image"
+            accept="image/*"
+            onChange={(e) => setForm({ ...form, imageFile: e.target.files[0] })}
+            disabled={formLoading}
+            className="w-full border rounded px-3 py-2"
+          />
+        </div>
+
         <div className="flex space-x-4">
           <button
             type="submit"
@@ -324,10 +395,13 @@ const ManageProducts = () => {
                   Catégorie
                 </th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Prix (€)
+                  Prix (DH)
                 </th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Stock
+                </th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Image
                 </th>
                 <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Actions
@@ -337,7 +411,9 @@ const ManageProducts = () => {
             <tbody className="divide-y divide-gray-200">
               {products.map((product) => (
                 <tr key={product._id}>
-                  <td className="px-6 py-4 whitespace-nowrap">{product.name}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {product.name}
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     {product.category?.name || "-"}
                   </td>
@@ -347,6 +423,18 @@ const ManageProducts = () => {
                   <td className="px-6 py-4 whitespace-nowrap text-right">
                     {product.stock}
                   </td>
+                  <td className="px-6 py-4 text-center">
+                    {product.image ? (
+                      <img
+                        src={`http://localhost:5000${product.image}`} // ✅ chemin absolu
+                        alt={product.name}
+                        className="h-12 w-12 object-cover rounded"
+                      />
+                    ) : (
+                      <span className="text-gray-400 italic">Aucune</span>
+                    )}
+                  </td>
+
                   <td className="px-6 py-4 whitespace-nowrap text-center space-x-2">
                     <button
                       onClick={() => handleEdit(product)}

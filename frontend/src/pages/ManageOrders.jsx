@@ -1,6 +1,6 @@
-// frontend/src/pages/ManageOrders.jsx
 import React, { useEffect, useState } from "react";
 import orderService from "../services/orderService";
+import { useAuth } from "../context/AuthContext";
 
 const ManageOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -8,11 +8,14 @@ const ManageOrders = () => {
   const [error, setError] = useState("");
   const [statusUpdating, setStatusUpdating] = useState(null);
 
+  const { user } = useAuth();
+
   const fetchOrders = async () => {
     setLoading(true);
     setError("");
     try {
-      const data = await orderService.getAllOrders();
+      const token = localStorage.getItem("token");
+      const data = await orderService.getAllOrders(token);
       setOrders(data);
     } catch {
       setError("Erreur lors du chargement des commandes.");
@@ -28,9 +31,16 @@ const ManageOrders = () => {
   const handleStatusChange = async (orderId, newStatus) => {
     setStatusUpdating(orderId);
     try {
-      const updatedOrder = await orderService.updateOrderStatus(orderId, newStatus);
+      const token = localStorage.getItem("token");
+      const updatedOrder = await orderService.updateOrderStatus(
+        orderId,
+        newStatus,
+        token
+      );
       setOrders((prev) =>
-        prev.map((order) => (order._id === updatedOrder._id ? updatedOrder : order))
+        prev.map((order) =>
+          order._id === updatedOrder._id ? updatedOrder : order
+        )
       );
     } catch {
       alert("Erreur lors de la mise à jour du statut.");
@@ -62,13 +72,17 @@ const ManageOrders = () => {
                     Date: {new Date(order.createdAt).toLocaleDateString()}
                   </p>
                   <p className="text-sm text-gray-600">
-                    Client: {order.user?.name || "Inconnu"}
+                    {/* Client: {order.user?.name || "Inconnu"} */}
+                    Client: {order.userId?.name || "Inconnu"}
+
                   </p>
                 </div>
                 <div>
                   <select
                     value={order.status}
-                    onChange={(e) => handleStatusChange(order._id, e.target.value)}
+                    onChange={(e) =>
+                      handleStatusChange(order._id, e.target.value)
+                    }
                     disabled={statusUpdating === order._id}
                     className="border rounded px-3 py-1"
                   >
@@ -80,13 +94,14 @@ const ManageOrders = () => {
               </div>
               <div>
                 <ul className="list-disc list-inside text-gray-700">
-                  {order.items.map((item) => (
+                  {(order.items || []).map((item) => (
                     <li key={item.product._id}>
                       {item.product.name} x {item.quantity} -{" "}
                       {(item.product.price * item.quantity).toFixed(2)} €
                     </li>
                   ))}
                 </ul>
+
                 <p className="mt-2 font-semibold">
                   Total: {order.total.toFixed(2)} €
                 </p>

@@ -3,13 +3,22 @@ import React, { useEffect, useState } from "react";
 import pharmacyService from "../services/pharmacyService";
 
 const Settings = () => {
+  // const [pharmacyInfo, setPharmacyInfo] = useState({
+  //   name: "",
+  //   address: "",
+  //   phone: "",
+  //   email: "",
+  //   openingHours: "",
+  // });
   const [pharmacyInfo, setPharmacyInfo] = useState({
-    name: "",
-    address: "",
-    phone: "",
-    email: "",
-    openingHours: "",
-  });
+  // nom: "",
+  adresse: "",
+  telephone: "",
+  email: "",
+  horaires: "",
+  pharmacieDeGarde: false,
+});
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -21,11 +30,13 @@ const Settings = () => {
     try {
       const data = await pharmacyService.getInfo();
       setPharmacyInfo({
-        name: data.name || "",
-        address: data.address || "",
-        phone: data.phone || "",
+        // nom: data.nom || "",
+        adresse: data.adresse || "",
+        telephone: data.telephone || "",
         email: data.email || "",
-        openingHours: data.openingHours || "",
+        horaires: data.horaires || "",
+        // pharmacieDeGarde: data.pharmacieDeGarde || false,
+          pharmacieDeGarde: data.pharmacieDeGarde ?? false,
       });
     } catch {
       setError("Erreur lors du chargement des informations.");
@@ -52,6 +63,13 @@ const Settings = () => {
     try {
       await pharmacyService.updateInfo(pharmacyInfo);
       setSuccessMsg("Informations mises à jour avec succès.");
+      // ✅ Réinitialiser le formulaire
+    setPharmacyInfo({
+      horaires: "",
+      adresse: "",
+      telephone: "",
+      pharmacieDeGarde: false,
+    });
     } catch {
       setError("Erreur lors de la mise à jour des informations.");
     } finally {
@@ -60,29 +78,26 @@ const Settings = () => {
   };
 
   return (
+   
+
     <div className="max-w-3xl mx-auto px-4 py-8">
+
       <h1 className="text-3xl font-semibold mb-6">Paramètres de la Pharmacie</h1>
+      <p className="text-lg font-semibold mb-4">
+      Pharmacie de garde :{" "}
+      {pharmacyInfo.pharmacieDeGarde ? (
+        <span className="text-green-600">Oui</span>
+      ) : (
+        <span className="text-red-600">Non</span>
+      )}
+    </p>
       {loading ? (
         <p>Chargement des informations...</p>
+
       ) : (
         <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow-md" noValidate>
           {error && <p className="mb-4 text-red-600 font-medium">{error}</p>}
           {successMsg && <p className="mb-4 text-green-600 font-medium">{successMsg}</p>}
-
-          <div className="mb-4">
-            <label htmlFor="name" className="block mb-1 font-medium">
-              Nom de la pharmacie
-            </label>
-            <input
-              type="text"
-              id="name"
-              name="name"
-              className="w-full border rounded px-3 py-2 focus:outline-none focus:ring border-gray-300"
-              value={pharmacyInfo.name}
-              onChange={handleChange}
-              disabled={saving}
-            />
-          </div>
 
           <div className="mb-4">
             <label htmlFor="address" className="block mb-1 font-medium">
@@ -90,10 +105,10 @@ const Settings = () => {
             </label>
             <input
               type="text"
-              id="address"
-              name="address"
+              id="adresse"
+              name="adresse"
               className="w-full border rounded px-3 py-2 focus:outline-none focus:ring border-gray-300"
-              value={pharmacyInfo.address}
+              value={pharmacyInfo.adresse}
               onChange={handleChange}
               disabled={saving}
             />
@@ -106,10 +121,10 @@ const Settings = () => {
               </label>
               <input
                 type="text"
-                id="phone"
-                name="phone"
+                id="telephone"
+                name="telephone"
                 className="w-full border rounded px-3 py-2 focus:outline-none focus:ring border-gray-300"
-                value={pharmacyInfo.phone}
+                value={pharmacyInfo.telephone}
                 onChange={handleChange}
                 disabled={saving}
               />
@@ -135,15 +150,36 @@ const Settings = () => {
               Horaires d'ouverture
             </label>
             <textarea
-              id="openingHours"
-              name="openingHours"
+              id="horaires"
+              name="horaires"
               rows="3"
               className="w-full border rounded px-3 py-2 focus:outline-none focus:ring resize-none border-gray-300"
-              value={pharmacyInfo.openingHours}
+              value={pharmacyInfo.horaires}
               onChange={handleChange}
               disabled={saving}
             />
           </div>
+     <div className="mb-6">
+  <label htmlFor="pharmacieDeGarde" className="block mb-1 font-medium">
+    Pharmacie de garde
+  </label>
+  <select
+    id="pharmacieDeGarde"
+    name="pharmacieDeGarde"
+    value={pharmacyInfo.pharmacieDeGarde ? "true" : "false"}
+    onChange={(e) =>
+      setPharmacyInfo((prev) => ({
+        ...prev,
+        pharmacieDeGarde: e.target.value === "true",
+      }))
+    }
+    disabled={saving}
+    className="w-full border rounded px-3 py-2 focus:outline-none focus:ring border-gray-300"
+  >
+    <option value="false">Non</option>
+    <option value="true">Oui</option>
+  </select>
+</div>
 
           <button
             type="submit"

@@ -9,7 +9,9 @@ const Cart = () => {
   const navigate = useNavigate();
 
   const handleCheckout = () => {
-    navigate("/orders/checkout");
+    // navigate("/orders/checkout");
+        navigate("/orders/checkout", { state: { cartItems: cartItems, total: totalPrice } });
+
   };
 
   if (cartItems.length === 0) {
@@ -26,7 +28,9 @@ const Cart = () => {
       <div className="space-y-4">
         {cartItems.map((item) => (
           <CartItem
-            key={item.product._id}
+            // key={item.product._id}
+            key={`${item.product._id}-${item.quantity}`}
+
             item={item}
             onRemove={() => removeFromCart(item.product._id)}
           />
