@@ -19,6 +19,32 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage });
+
+// Get products by category ID
+// router.get('/category/:categoryId', async (req, res) => {
+//   try {
+//     const { categoryId } = req.params;
+//     const products = await Product.find({ category: categoryId }).populate('category');
+//     res.json(products);
+//   } catch (error) {
+//     console.error('Get products by category error:', error);
+//     res.status(500).json({ message: 'Server error' });
+//   }
+// });
+router.get('/category/:categoryId', async (req, res) => {
+  try {
+    const { categoryId } = req.params;
+
+    // Assure-toi que categoryId est bien un ObjectId
+    const products = await Product.find({ category: categoryId }).populate('category');
+
+    res.json(products);
+  } catch (error) {
+    console.error('Get products by category error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 // Get all products
 router.get('/', async (req, res) => {
   try {
@@ -73,25 +99,7 @@ router.post(
     }
   }
 );
-// Update product (admin only)
-// router.put('/:id', authMiddleware, roleMiddleware(['admin']), async (req, res) => {
-//   try {
-//     const product = await Product.findByIdAndUpdate(
-//       req.params.id,
-//       req.body,
-//       { new: true }
-//     ).populate('category');
-    
-//     if (!product) {
-//       return res.status(404).json({ message: 'Product not found' });
-//     }
-    
-//     res.json(product);
-//   } catch (error) {
-//     console.error('Update product error:', error);
-//     res.status(500).json({ message: 'Server error' });
-//   }
-// });
+
 router.put(
   "/:id",
   authMiddleware,
@@ -136,5 +144,8 @@ router.delete('/:id', authMiddleware, roleMiddleware(['admin']), async (req, res
     res.status(500).json({ message: 'Server error' });
   }
 });
+
+
+
 
 module.exports = router;

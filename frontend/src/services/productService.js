@@ -20,12 +20,6 @@ const createProduct = async (formData) => {
   return res.data;
 };
 
-
-// const updateProduct = async (id, productData) => {
-//   const response = await axios.put(`${API_URL}/${id}`, productData);
-//   return response.data;
-// };
-
 const updateProduct = async (id, formData) => {
   const res = await axios.put(`/api/products/${id}`, formData, {
     headers: { "Content-Type": "multipart/form-data" },

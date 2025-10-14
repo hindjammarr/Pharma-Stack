@@ -88,63 +88,6 @@ const ManageProducts = () => {
     }
   };
 
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-  //   const errs = validateForm();
-  //   if (Object.keys(errs).length > 0) {
-  //     setFormErrors(errs);
-  //     return;
-  //   }
-  //   setFormLoading(true);
-  //   setFormMessage("");
-  //   try {
-  //     if (form._id) {
-  //       // update
-  //       const updated = await productService.updateProduct(form._id, {
-  //         name: form.name.trim(),
-  //         description: form.description.trim(),
-  //         price: Number(form.price),
-  //         category: form.category,
-  //         stock: Number(form.stock),
-  //       });
-  //       setProducts((prev) =>
-  //         prev.map((p) => (p._id === updated._id ? updated : p))
-  //       );
-  //       setFormMessage("Produit mis à jour avec succès.");
-  //     } else {
-  //       const formData = new FormData();
-  //       formData.append("name", form.name.trim());
-  //       formData.append("description", form.description.trim());
-  //       formData.append("price", Number(form.price));
-  //       formData.append("category", form.category);
-  //       formData.append("stock", Number(form.stock));
-  //       if (form.imageFile) {
-  //         formData.append("image", form.imageFile); // ✅ fichier image
-  //       }
-         
-  //       const created = await productService.createProduct(formData);
-
-  //       setProducts((prev) => [created, ...prev]);
-  //       setFormMessage("Produit créé avec succès.");
-  //     }
-  //     setForm({
-  //       _id: null,
-  //       name: "",
-  //       description: "",
-  //       price: "",
-  //       category: "",
-  //       stock: "",
-  //       imageFile: null,
-  //     });
-  //     setFormErrors({});
-  //   } catch {
-  //     setFormMessage("Erreur lors de la sauvegarde du produit.");
-  //   } finally {
-  //     setFormLoading(false);
-  //     // frontend/src/pages/ManageProducts.jsx (continued)
-  //     setFormLoading(false);
-  //   }
-  // };
    const handleSubmit = async (e) => {
   e.preventDefault();
   const errs = validateForm();
