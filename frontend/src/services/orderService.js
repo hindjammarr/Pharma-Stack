@@ -23,7 +23,6 @@ const createOrder = async (orderData, token) => {
   const response = await axios.post("/api/orders", orderData, {
     headers: { Authorization: `Bearer ${token}` },
   });
-
   return response.data;
 };
 

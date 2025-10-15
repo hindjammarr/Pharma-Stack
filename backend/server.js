@@ -80,19 +80,55 @@ app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/pharmacy', require('./routes/pharmacyRoutes'));
 
 
+// app.post('/api/create-payment-intent', async (req, res) => {
+//   try {
+//     const { amount, currency, cartItems, shippingInfo, email, userId } = req.body;
+
+//     // 1️⃣ Create payment intent
+//     const paymentIntent = await stripe.paymentIntents.create({
+//       amount,
+//       currency,
+//       receipt_email: email,
+//       metadata: {
+//         userId,
+//         cartItems: JSON.stringify(cartItems),
+//         shippingInfo: JSON.stringify(shippingInfo),
+//       },
+//     });
+
+//     res.status(200).send({
+//       clientSecret: paymentIntent.client_secret,
+//     });
+//   } catch (error) {
+//     console.error('Error creating payment intent:', error);
+//     res.status(500).json({ message: 'Erreur serveur Stripe' });
+//   }
+// });
 app.post('/api/create-payment-intent', async (req, res) => {
   try {
     const { amount, currency, cartItems, shippingInfo, email, userId } = req.body;
+    console.log("userId reçu :", userId);
+    // 🧹 Simplifier les données à envoyer
+    const simplifiedCart = cartItems.map((item) => ({
+      name: item.product.name,
+      quantity: item.quantity,
+    }));
 
-    // 1️⃣ Create payment intent
+    const simplifiedShipping = {
+      city: shippingInfo.city,
+      country: shippingInfo.country,
+      postalCode: shippingInfo.postalCode,
+    };
+
     const paymentIntent = await stripe.paymentIntents.create({
       amount,
       currency,
       receipt_email: email,
       metadata: {
-        userId,
-        cartItems: JSON.stringify(cartItems),
-        shippingInfo: JSON.stringify(shippingInfo),
+        // userId: userId.toString(),    
+  userId: userId ? userId.toString() : "anonymous",
+        cartSummary: JSON.stringify(simplifiedCart),
+        shippingSummary: JSON.stringify(simplifiedShipping),
       },
     });
 

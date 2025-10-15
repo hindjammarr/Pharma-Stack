@@ -46,7 +46,9 @@ export const AuthProvider = ({ children }) => {
       const { token, user } = response.data
       
       localStorage.setItem('token', token)
-      setToken(null);
+      // setToken(null);
+      setToken(token); 
+
 
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
       setUser(user)
@@ -66,7 +68,9 @@ export const AuthProvider = ({ children }) => {
       const { token, user } = response.data
       
       localStorage.setItem('token', token)
-      setToken(null);
+      // setToken(null);
+      setToken(token); // ✅ stocke le vrai token
+
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
       setUser(user)
       

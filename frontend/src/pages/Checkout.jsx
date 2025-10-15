@@ -99,7 +99,9 @@ const CheckoutForm = ({
   const elements = useElements();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [paymentError, setPaymentError] = useState("");
-  const { token } = useAuth();
+const { token, user } = useAuth();
+
+
 
 
   const handleChange = (e) => {
@@ -129,27 +131,25 @@ const CheckoutForm = ({
     setPaymentError("");
 
     try {
-      const response = await fetch(
-        "http://localhost:5000/api/create-payment-intent",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            amount: Math.round(grandTotal * 100),
-            currency: "eur",
-            cartItems,
-            email: formData.email,
-            shippingInfo: {
-              name: `${formData.firstName} ${formData.lastName}`,
-              phone: formData.phone,
-              address: formData.address,
-              city: formData.city,
-              zipCode: formData.zipCode,
-            },
-          }),
-        
-        }
-      );
+      const response = await fetch("http://localhost:5000/api/create-payment-intent", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    amount: Math.round(grandTotal * 100),
+    currency: "eur",
+    cartItems,
+    email: formData.email,
+    userId: user?._id, // ✅ AJOUT ICI
+    shippingInfo: {
+      name: `${formData.firstName} ${formData.lastName}`,
+      phone: formData.phone,
+      address: formData.address,
+      city: formData.city,
+      zipCode: formData.zipCode,
+    },
+  }),
+});
+
 
       if (!response.ok) throw new Error("Erreur création paiement");
 
@@ -180,7 +180,6 @@ const CheckoutForm = ({
    if (error) {
         setPaymentError(error.message);
       } else if (paymentIntent.status === "succeeded") {
-        // ✅ Créer la commande dans la base
         const orderData = {
           products: cartItems.map((item) => ({
             product: item.product._id,
@@ -200,6 +199,7 @@ const CheckoutForm = ({
 
         try {
           await orderService.createOrder(orderData, token);
+          console.log("🪪 Token envoyé au backend:", token);
           onSuccess();
           alert("✅ Paiement réussi et commande enregistrée !");
         } catch (err) {
